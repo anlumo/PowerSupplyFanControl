@@ -46,7 +46,6 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc;
 
-TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim14;
 TIM_HandleTypeDef htim16;
 
@@ -61,11 +60,10 @@ UART_HandleTypeDef huart1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC_Init(void);
-static void MX_TIM1_Init(void);
 static void MX_TIM14_Init(void);
 static void MX_TIM16_Init(void);
 static void MX_USART1_UART_Init(void);
-                                    
+
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                                 
 
@@ -104,12 +102,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC_Init();
-  MX_TIM1_Init();
   MX_TIM14_Init();
   MX_TIM16_Init();
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
+
+  HAL_TIM_Base_Start(&htim16);
+  HAL_TIM_PWM_Start(&htim16, TIM_CHANNEL_1);
+
+  HAL_GPIO_WritePin(PS_ON_GPIO_Port, PS_ON_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(FAN_GPIO_Port, FAN_Pin, GPIO_PIN_RESET);
 
   /* USER CODE END 2 */
 
@@ -120,6 +123,8 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+//	  GPIO_PinState state = HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin);
+//	  HAL_GPIO_WritePin(PS_ON_GPIO_Port, PS_ON_Pin, state);
 
   }
   /* USER CODE END 3 */
@@ -213,7 +218,7 @@ static void MX_ADC_Init(void)
     */
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -234,61 +239,6 @@ static void MX_ADC_Init(void)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
-
-}
-
-/* TIM1 init function */
-static void MX_TIM1_Init(void)
-{
-
-  TIM_MasterConfigTypeDef sMasterConfig;
-  TIM_OC_InitTypeDef sConfigOC;
-  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
-
-  htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 0;
-  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 0;
-  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
-  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
-  sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-  sBreakDeadTimeConfig.DeadTime = 0;
-  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-  if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-  HAL_TIM_MspPostInit(&htim1);
 
 }
 
@@ -333,9 +283,9 @@ static void MX_TIM16_Init(void)
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
 
   htim16.Instance = TIM16;
-  htim16.Init.Prescaler = 0;
+  htim16.Init.Prescaler = 40000;
   htim16.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim16.Init.Period = 0;
+  htim16.Init.Period = 500;
   htim16.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim16.Init.RepetitionCounter = 0;
   htim16.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -350,7 +300,7 @@ static void MX_TIM16_Init(void)
   }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
+  sConfigOC.Pulse = 400;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -367,7 +317,7 @@ static void MX_TIM16_Init(void)
   sBreakDeadTimeConfig.DeadTime = 0;
   sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
   sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_ENABLE;
   if (HAL_TIMEx_ConfigBreakDeadTime(&htim16, &sBreakDeadTimeConfig) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -382,7 +332,7 @@ static void MX_USART1_UART_Init(void)
 {
 
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 38400;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -414,10 +364,16 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, PS_ON_Pin|FAN_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PA5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  /*Configure GPIO pin : BUTTON_Pin */
+  GPIO_InitStruct.Pin = BUTTON_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(BUTTON_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PS_ON_Pin FAN_Pin */
+  GPIO_InitStruct.Pin = PS_ON_Pin|FAN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

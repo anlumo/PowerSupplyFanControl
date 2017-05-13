@@ -46,6 +46,21 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define BUTTON_Pin GPIO_PIN_0
+#define BUTTON_GPIO_Port GPIOA
+#define TEMP0_Pin GPIO_PIN_1
+#define TEMP0_GPIO_Port GPIOA
+#define TEMP1_Pin GPIO_PIN_4
+#define TEMP1_GPIO_Port GPIOA
+#define PS_ON_Pin GPIO_PIN_5
+#define PS_ON_GPIO_Port GPIOA
+#define LED_Pin GPIO_PIN_6
+#define LED_GPIO_Port GPIOA
+#define TACHO_Pin GPIO_PIN_7
+#define TACHO_GPIO_Port GPIOA
+#define FAN_Pin GPIO_PIN_9
+#define FAN_GPIO_Port GPIOA
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
