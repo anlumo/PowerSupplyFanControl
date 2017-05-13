@@ -41,6 +41,8 @@
 
 /* USER CODE BEGIN Includes */
 
+#include "fan.h"
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -130,6 +132,13 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 //	  GPIO_PinState state = HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin);
+
+	  GPIO_PinState state = HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin);
+	  if(state == GPIO_PIN_SET) {
+		  setFanSpeed(128);
+	  } else {
+		  setFanSpeed(0);
+	  }
 //	  HAL_GPIO_WritePin(PS_ON_GPIO_Port, PS_ON_Pin, state);
 
   }
