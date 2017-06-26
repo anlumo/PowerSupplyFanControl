@@ -48,6 +48,7 @@
 
 #define BUTTON_Pin GPIO_PIN_0
 #define BUTTON_GPIO_Port GPIOA
+#define BUTTON_EXTI_IRQn EXTI0_1_IRQn
 #define TEMP0_Pin GPIO_PIN_1
 #define TEMP0_GPIO_Port GPIOA
 #define TEMP1_Pin GPIO_PIN_4
