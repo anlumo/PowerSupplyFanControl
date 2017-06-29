@@ -90,7 +90,22 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 volatile bool tempAvailable = false;
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
-	tempAvailable = true;
+	uint16_t temperature = g_tempValues[0];
+	if (temperature <= TEMP_CRITICAL || temperature == 0xffff) {
+		// emergency stop; 0xffff means sensor failure (open circuit)
+		g_mainPower = false;
+		HAL_GPIO_WritePin(PS_ON_GPIO_Port, PS_ON_Pin, GPIO_PIN_RESET);
+		setFanSpeed(0xff);
+	} else if (g_tempValues[1] < g_tempValues[0]) {
+		// intake temperature is higher than our internals, don't let the heat in
+		setFanSpeed(0x0);
+	} else if (temperature < TEMP_OFFSET) {
+		setFanSpeed(0xff);
+	} else if (temperature > TEMP_MAX) {
+		setFanSpeed(0x0);
+	} else {
+		setFanSpeed(TEMP_LOOKUP[(temperature - TEMP_OFFSET) / TEMP_STEP]);
+	}
 }
 
 /* USER CODE END 0 */
