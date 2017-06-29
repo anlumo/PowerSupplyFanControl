@@ -44,14 +44,6 @@ extern DMA_HandleTypeDef hdma_adc;
 extern void _Error_Handler(char *, int);
 /* USER CODE BEGIN 0 */
 
-#include "main.h"
-
-extern volatile uint16_t g_tempValues[3];
-extern TIM_HandleTypeDef htim1;
-extern TIM_HandleTypeDef htim14;
-extern TIM_HandleTypeDef htim16;
-extern TIM_HandleTypeDef htim17;
-
 /* USER CODE END 0 */
 /**
   * Initializes the Global MSP.
